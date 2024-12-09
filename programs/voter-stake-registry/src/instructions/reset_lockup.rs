@@ -51,6 +51,14 @@ pub fn reset_lockup(
         VsrError::InvalidChangeToClawbackDepositEntry
     );
 
+    msg!("Lockup Kind : {:?}", kind);
+    msg!(
+        "Duration : {:?}",
+        (curr_ts as u64)
+            .checked_add((periods as u64).checked_mul(kind.period_secs()).unwrap())
+            .unwrap(),
+    );
+
     // Change the deposit entry.
     let d_entry = voter.active_deposit_mut(deposit_entry_index)?;
     d_entry.amount_initially_locked_native = d_entry.amount_deposited_native;
