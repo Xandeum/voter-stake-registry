@@ -46,8 +46,8 @@ pub struct Grant<'info> {
 
     #[account(
         mut,
-        constraint = deposit_token.owner == token_authority.key(),
-        constraint = deposit_token.mint == deposit_mint.key(),
+        // constraint = deposit_token.owner == token_authority.key(),
+        // constraint = deposit_token.mint == deposit_mint.key(),
     )]
     pub deposit_token: Box<Account<'info, TokenAccount>>,
 
@@ -109,6 +109,15 @@ pub fn grant(
 ) -> Result<()> {
     require_eq!(voter_bump, ctx.bumps.voter);
     require_eq!(voter_weight_record_bump, ctx.bumps.voter_weight_record);
+
+    require!(
+        ctx.accounts.deposit_token.owner == ctx.accounts.token_authority.key(),
+        VsrError::InvalidMint
+    );
+    require!(
+        ctx.accounts.deposit_token.mint == ctx.accounts.deposit_mint.key(),
+        VsrError::InvalidMint
+    );
 
     // Load accounts.
     let registrar = &ctx.accounts.registrar.load()?;
